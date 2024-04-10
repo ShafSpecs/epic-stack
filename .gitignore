@@ -3,6 +3,7 @@ node_modules
 
 /build
 /server-build
+/public/entry.worker.js
 .env
 .cache
 

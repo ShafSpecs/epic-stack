@@ -1,3 +1,4 @@
+import { remixPWA } from '@remix-pwa/dev'
 import { vitePlugin as remix } from '@remix-run/dev'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 import { glob } from 'glob'
@@ -58,5 +59,6 @@ export default defineConfig({
 					},
 				})
 			: null,
+    remixPWA()
 	],
 })
