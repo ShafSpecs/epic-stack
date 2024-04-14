@@ -1,8 +1,8 @@
 import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
-import { useNetworkConnectivity } from '@remix-pwa/client'
-import { useSWEffect } from '@remix-pwa/sw'
+import { useNetworkConnectivity, usePWAManager } from '@remix-pwa/client'
+import { sendSkipWaitingMessage, useSWEffect } from '@remix-pwa/sw'
 import {
   json,
   type LoaderFunctionArgs,
@@ -231,6 +231,8 @@ function App() {
   useToast(data.toast)
   useSWEffect()
 
+  const { swUpdate } = usePWAManager()
+
   useNetworkConnectivity({
     onOnline: () => {
       const id = 'network-connectivity'
@@ -288,6 +290,15 @@ function App() {
       </div>
       <EpicToaster closeButton position="top-center" theme={theme} />
       <EpicProgress />
+      {swUpdate.isUpdateAvailable && (
+        <div className='bg-background text-foreground fixed bottom-6 right-6'>
+          <p>Update available</p>
+          <button onClick={() => {
+            sendSkipWaitingMessage(swUpdate.newWorker!)
+            window.location.reload()
+          }}>Reload</button>
+        </div>
+      )}
     </Document>
   )
 }

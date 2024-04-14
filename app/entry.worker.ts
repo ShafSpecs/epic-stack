@@ -7,6 +7,7 @@ import {
 	isLoaderRequest,
 	Logger,
 	NavigationHandler,
+  SkipWaitHandler,
 	type DefaultFetchHandler,
 } from '@remix-pwa/sw'
 
@@ -16,7 +17,7 @@ const logger = new Logger({
 	prefix: '[Epic Stack]',
 })
 
-const version = 'v1'
+const version = 'v2'
 
 const DOCUMENT_CACHE_NAME = `document-cache`
 const ASSET_CACHE_NAME = `asset-cache`
@@ -55,7 +56,7 @@ self.addEventListener('install', event => {
     assetCache.preCacheUrls(
       self.__workerManifest.assets.filter(url => !url.endsWith('.map') && !url.endsWith('.js'))
     ),
-    self.skipWaiting(),
+    // self.skipWaiting(),
   ]))
 })
 
@@ -90,7 +91,15 @@ export const defaultFetchHandler: DefaultFetchHandler = async ({ context }) => {
 const messageHandler = new NavigationHandler({
   cache: documentCache
 })
+const skipHandler = new SkipWaitHandler()
 
 self.addEventListener('message', (event: ExtendableMessageEvent) => {
-  event.waitUntil(messageHandler.handleMessage(event))
+  event.waitUntil(Promise.all([
+    messageHandler.handleMessage(event),
+    skipHandler.handleMessage(event),
+  ]))
 })
+
+// self.addEventListener('messageerror', (event: MessageEvent) => {
+//   logger.error('Message error', event)
+// })
